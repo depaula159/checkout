@@ -73,6 +73,9 @@
         flex-direction: column;
         height: auto;
       }
+      #checkoutClear small{
+        margin-bottom: 12px;
+      }
       #checkoutClear #img{
         width: 160px;
         height: 160px;
@@ -223,6 +226,7 @@
           <h1>{{'Nome: ' + validarCampo.dadosUser[0] + ' ' + validarCampo.dadosUser[1]}}</h1>
           <small>{{'Telefone: ' + validarCampo.dadosUser[2]}}</small>
           <small>{{'E-mail: ' + validarCampo.dadosUser[3]}}</small>
+          <small>{{'Data: ' + info.tempo}}</small>
           <hr color="white" size="thin" width="100%">
           <small>Valor do produto:</small>
           <h2 style="font-size: 3.5rem;">{{valorProduto}}</h2>
@@ -244,6 +248,9 @@
       new Vue({
         el: "#app-form",
         data: {
+          info:{
+            tempo: new Date(),
+          },
           validarCampo: {
             nomeDigitado: "",
             sobrenomeDigitado: "",
