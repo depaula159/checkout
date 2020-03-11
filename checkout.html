@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Metas -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema Checkout | DailyFrontEnd - Ricardo de Paula Silva</title>
+    <!-- Links -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.css" />
+    <script src="js/vue.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <style>
+      .container {
+        padding-top: 20px;
+      }
+      .jumbotron {
+        background-color: #007bff;
+        border-radius: 0%;
+        height: auto;
+      }
+      .jumbotron section form input {
+        margin-bottom: 25px;
+      }
+      .jumbotron h2 {
+        margin-bottom: 30px;
+        color: white;
+      }
+      .jumbotron section form label {
+        margin-bottom: 12px;
+        color: white;
+      }
+
+      .jumbotron section form button {
+        float: right;
+      }
+      .container .btn-group .btn {
+        border-radius: 0%;
+      }
+      #formPagamento {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+      }
+      #formPagamento .container-sm {
+        background-color: white;
+        border-radius: 12px;
+        display: flex;
+        margin: 15px;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        width: 200px;
+        height: 200px;
+        padding: 12px;
+      }
+      #formPagamento .container-sm:hover{
+        cursor: pointer;
+        -webkit-transform: scale(1.1);
+        -moz-transform: scale(1.1);
+        transform: scale(1.1);
+        -webkit-transition: all .4s ease-in;
+        -moz-transition: all .4s ease-in;
+        transition: all .4s ease-in;
+      }
+      #checkoutClear{
+        color: white;
+        display: none;
+        flex-direction: column;
+        height: auto;
+      }
+      #checkoutClear #img{
+        width: 160px;
+        height: 160px;
+        border: 5px solid white;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-bottom: 12px;
+      }
+      #checkoutClear .btn-cancel-done{
+        height: auto;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      #checkoutClear .btn-cancel-done .btn{
+        margin: 5px;
+      }
+      @media only screen and (max-width: 600px) {
+        .jumbotron section form button {
+          width: 100%;
+        }
+        .container .btn-group .btn {
+          padding: 5px;
+        }
+        #formPagamento{
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="app-form">
+      <div class="btn-group">
+        <button
+          v-bind:class="this.validarCampo.checkDados == false ? classes.btnDadosPessoaisActive : classes.btnDadosPessoaisDisable"
+          id="btn1"
+        >
+          Dados pessoais
+        </button>
+        <button
+          v-bind:class="this.validarCampo.checkDados == true && this.validarCampo.checkPag == false ? classes.btnPagamentoActive : classes.btnPagamentoDisable"
+          id="btn2"
+        >
+          Formas de pagamento
+        </button>
+        <button v-bind:class="this.validarCampo.checkPag == true ? classes.btnConcluidoActive : classes.btnConcluidoDisable" id="btn3">Concluído</button>
+      </div>
+      <article class="jumbotron">
+        <h2 id="textCheckout">Preencha os campos abaixo:</h2>
+        <section id="formCheckout">
+          <form
+            name="form1"
+            class="form-group"
+            v-on:submit.prevent="enviarDados()"
+          >
+            <!-- Bloco 1 -->
+            <div class="row">
+              <div class="col-xl">
+                <label for="inNome">Nome:</label><br />
+                <input
+                  type="text"
+                  name="nome"
+                  id="inNome"
+                  class="form-control"
+                  placeholder="Digite seu nome"
+                  v-model="validarCampo.nomeDigitado"
+                />
+              </div>
+              <div class="col-xl">
+                <label for="inSobrenome">Sobrenome:</label><br />
+                <input
+                  type="text"
+                  name="sobrenome"
+                  id="inSobrenome"
+                  class="form-control"
+                  placeholder="Digite seu sobrenome"
+                  v-model="validarCampo.sobrenomeDigitado"
+                />
+              </div>
+            </div>
+            <!-- Bloco2 -->
+            <div class="row">
+              <div class="col-xl">
+                <label for="inTelefone">Telefone:</label><br />
+                <input
+                  type="text"
+                  name="telefone"
+                  id="inTelefone"
+                  class="form-control"
+                  placeholder="(xx) xxxxx-xxxx"
+                  v-model="validarCampo.telefoneDigitado"
+                />
+              </div>
+              <div class="col-xl">
+                <label for="inEmail">E-mail:</label><br />
+                <input
+                  type="text"
+                  name="email"
+                  id="inEmail"
+                  class="form-control"
+                  placeholder="Digite seu e-mail"
+                  v-model="validarCampo.emailDigitado"
+                />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-outline-light btn-md" v-if="validarCampo.nomeDigitado.length > 0 && validarCampo.sobrenomeDigitado.length > 0 && validarCampo.telefoneDigitado.length > 0 && validarCampo.emailDigitado.indexOf('@') > 0">
+              Continuar
+            </button>
+          </form>
+        </section>
+        <!-- Formas de pagamento -->
+        <section id="formPagamento">
+          <div class="container-sm" v-on:click="pagamentoSelecionado()">
+            <i
+              class="fa fa-barcode"
+              style="font-size: 5.3rem; margin-bottom: 15px; color: #007bff;"
+            ></i>
+            <h4 style="font-size: 1.2rem; color: #007bff;">Boleto</h4>
+          </div>
+          <div class="container-sm" v-on:click="pagamentoSelecionado()">
+            <i
+              class="fa fa-credit-card"
+              style="font-size: 5.3rem; margin-bottom: 15px; color: #007bff;"
+            ></i>
+            <h4 style="font-size: 1.2rem; color: #007bff;">
+              Cartão de crédito/débito
+            </h4>
+          </div>
+          <div class="container-sm" v-on:click="pagamentoSelecionado()">
+            <i
+              class="fa fa-bank"
+              style="font-size: 5.3rem; margin-bottom: 15px; color: #007bff;"
+            ></i>
+            <h4 style="font-size: 1.2rem; color: #007bff;">
+              Transferência bancária
+            </h4>
+          </div>
+        </section>
+        <section id="checkoutClear">
+          <div id="img"><i class="fa fa-photo" style="font-size: 5.3rem; margin-bottom: 15px; color: #fff;"></i>
+            <h4 style="font-size: 0.5rem; color: #fff;">
+              Foto do produto
+            </h4>
+          </div>
+          <h1>{{'Nome: ' + validarCampo.dadosUser[0] + ' ' + validarCampo.dadosUser[1]}}</h1>
+          <small>{{'Telefone: ' + validarCampo.dadosUser[2]}}</small>
+          <small>{{'E-mail: ' + validarCampo.dadosUser[3]}}</small>
+          <hr color="white" size="thin" width="100%">
+          <small>Valor do produto:</small>
+          <h2>{{valorProduto}}</h2>
+          <div class="btn-cancel-done">
+            <a href="checkout.html"><button class="btn btn-outline-light">Cancelar</button></a>
+            <button class="btn btn-light">Finalizar</button>
+          </div>
+        </section>
+      </article>
+      <center>
+        <small>DailyFrontEnd | Ricardo de Paula Silva &copy; 2020</small>
+      </center>
+      <code style="position: sticky; bottom: 12px; float: right; margin-top: 30px; font-size: 7pt; color: teal;">{{'Captação de texto VueJs: ' + validarCampo.nomeDigitado + ' ' +
+      validarCampo.sobrenomeDigitado + ' ' + validarCampo.telefoneDigitado + ' ' +
+      validarCampo.emailDigitado}}</code>
+    </div>
+    <!-- Vue Js | Validações -->
+    <script>
+      new Vue({
+        el: "#app-form",
+        data: {
+          validarCampo: {
+            nomeDigitado: "",
+            sobrenomeDigitado: "",
+            telefoneDigitado: "",
+            emailDigitado: "",
+            dadosUser: [],
+            checkDados: false,
+            checkPag: false
+          },
+          classes: {
+            btnDadosPessoaisActive: "btn btn-primary",
+            btnDadosPessoaisDisable: "btn btn-outline-primary ",
+            btnPagamentoActive: "btn btn-primary",
+            btnPagamentoDisable: "btn btn-outline-primary",
+            btnConcluidoActive: "btn btn-primary",
+            btnConcluidoDisable: "btn btn-outline-primary"
+          },
+          valorProduto: '12,00' 
+        },
+        methods: {
+          enviarDados: function() {
+            this.validarCampo.dadosUser.push(this.validarCampo.nomeDigitado);
+            this.validarCampo.dadosUser.push(
+              this.validarCampo.sobrenomeDigitado
+            );
+            this.validarCampo.dadosUser.push(
+              this.validarCampo.telefoneDigitado
+            );
+            this.validarCampo.dadosUser.push(this.validarCampo.emailDigitado);
+            this.validarCampo.checkDados = true;
+            alert("Obrigado! Agora selecione o método de pagamento.");
+            if (this.validarCampo.checkDados == true) {
+              var formCheck = document.getElementById("formCheckout");
+              formPag = document.getElementById("formPagamento");
+              document.getElementById("textCheckout").innerHTML =
+                "Escolha a forma de pagamento:";
+              formCheck.style.display = "none";
+              formPag.style.display = "flex";
+            }
+          },
+          pagamentoSelecionado: function() {
+            this.validarCampo.checkPag = true;
+            formPag.style.display = 'none';
+            document.getElementById("textCheckout").innerHTML = "Resumo:";
+            var checkoutInfo = document.getElementById("checkoutClear");
+            checkoutInfo.style.display = 'flex';
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
